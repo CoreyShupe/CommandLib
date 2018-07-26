@@ -1,10 +1,8 @@
 package com.github.coreyshupe.commandlib.parse;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.IdentityHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -83,7 +81,9 @@ public class ClassParser<I> {
       }
       throw new IllegalArgumentException("Failed to parse class `" + clazz.getName() + "`.");
     }
-    contentQueue.iterator().forEachRemaining(s -> parsed.addLast(defaultParser.apply(content, author)));
+    contentQueue
+        .iterator()
+        .forEachRemaining(s -> parsed.addLast(defaultParser.apply(content, author)));
     return parsed;
   }
 }
