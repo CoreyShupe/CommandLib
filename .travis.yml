@@ -1,0 +1,12 @@
+language: java
+
+stages:
+- build
+
+jobs:
+  include:
+    - stage: build
+      jdk: oraclejdk10
+      script: mvn -B verify
+    - jdk: openjdk10
+      script: mvn -B verify
