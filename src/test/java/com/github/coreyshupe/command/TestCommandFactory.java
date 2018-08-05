@@ -67,7 +67,7 @@ public class TestCommandFactory {
       Assertions.fail("Failed to get method exampleHelloCommand(...)");
     }
     var params = factory.generateParameters(method, false, false);
-    Assertions.assertThat(params)
+    Assertions.assertThat(params.getKey())
         .hasSize(1)
         .containsExactly(new CommandParameter<>(Integer.class, false, true, 1));
   }

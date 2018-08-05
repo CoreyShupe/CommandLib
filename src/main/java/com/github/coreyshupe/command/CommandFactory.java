@@ -3,6 +3,7 @@ package com.github.coreyshupe.command;
 import com.github.coreyshupe.command.annotations.Command;
 import com.github.coreyshupe.command.annotations.CommandSet;
 import com.github.coreyshupe.command.annotations.Default;
+import com.github.coreyshupe.command.annotations.Description;
 import com.github.coreyshupe.command.annotations.DoNotInit;
 import com.github.coreyshupe.command.annotations.IgnoreAuthor;
 import com.github.coreyshupe.command.annotations.IgnoreExtraArgs;
@@ -148,9 +149,12 @@ public class CommandFactory<I> {
     var command = method.getAnnotationsByType(Command.class)[0];
     var ignoreAuthor = method.isAnnotationPresent(IgnoreAuthor.class);
     var ignoreExtra = method.isAnnotationPresent(IgnoreExtraArgs.class);
-    var parameters = generateParameters(method, ignoreAuthor, ignoreExtra);
+    var parameterInfo = generateParameters(method, ignoreAuthor, ignoreExtra);
+    var parameters = parameterInfo.getKey();
+    var parameterDescriptors = parameterInfo.getValue();
     var abstractCommand =
-        new AbstractCommand<I>(command.value(), command.aliases(), command.description()) {
+        new AbstractCommand<I>(
+            command.value(), command.aliases(), command.description(), parameterDescriptors) {
           @Override
           public void accept(I author, String content) {
             var context =
@@ -190,16 +194,18 @@ public class CommandFactory<I> {
     registerCommand(abstractCommand);
   }
 
-  public List<CommandParameter<?>> generateParameters(
+  public Pair<List<CommandParameter<?>>, String[]> generateParameters(
       Method method, boolean ignoreAuthor, boolean ignoreExtra) {
     var parameters = new ArrayList<CommandParameter<?>>();
     var paramTypes = method.getParameterTypes();
     var paramAnnotations = method.getParameterAnnotations();
+    var paramDescriptors = new ArrayList<String>();
     for (var i = ignoreAuthor ? 0 : 1; i < paramTypes.length - (ignoreExtra ? 0 : 1); i++) {
       var type = paramTypes[i];
       boolean optional = false;
       boolean reset = false;
       String[] defaultInfo = new String[] {};
+      String description = null;
       for (var annotation : paramAnnotations[i]) {
         var annotationType = annotation.annotationType();
         if (annotationType == Default.class) {
@@ -208,12 +214,15 @@ public class CommandFactory<I> {
           optional = true;
         } else if (annotationType == ResetIfAbsent.class) {
           reset = true;
+        } else if (annotationType == Description.class) {
+          description = ((Description) annotation).value();
         }
       }
+      paramDescriptors.add(description == null ? "N/A" : description);
       var parameter = new CommandParameter<>(type, reset, optional, i, defaultInfo);
       parameters.add(parameter);
     }
-    return parameters;
+    return Pair.of(parameters, paramDescriptors.toArray(new String[] {}));
   }
 
   public void registerCommand(AbstractCommand<I> abstractCommand) {

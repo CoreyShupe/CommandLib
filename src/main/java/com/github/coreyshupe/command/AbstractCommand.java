@@ -19,15 +19,23 @@ public abstract class AbstractCommand<I> implements BiConsumer<I, String> {
   private final String command;
   private final Set<String> aliases;
   private final String description;
+  private final String[] paramDescriptors;
 
-  public AbstractCommand(String command, String[] aliases, String description) {
-    this(command, Arrays.asList(aliases), description);
+  public AbstractCommand(
+      String command, String[] aliases, String description, String... paramDescriptors) {
+    this(command, Arrays.asList(aliases), description, paramDescriptors);
   }
 
-  public AbstractCommand(String command, Collection<String> aliases, String description) {
+  public AbstractCommand(
+      String command, Collection<String> aliases, String description, String... paramDescriptors) {
     this.command = command;
     this.aliases = new HashSet<>(aliases);
     this.description = description;
+    this.paramDescriptors = paramDescriptors;
+  }
+
+  public String[] getParamDescriptors() {
+    return paramDescriptors;
   }
 
   /** @return The command name. */
