@@ -1,15 +1,19 @@
-package com.github.coreyshupe.commandlib.parse;
+package com.github.coreyshupe.command.parse;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/**
+ * Parses classes with a given author and context using a {@link ClassParseFunction}.
+ *
+ * @param <I> The type of author.
+ * @author CoreyShupe, created on 2018/08/01
+ */
 public class ClassParser<I> {
 
+  private static final Function<String, Optional<String>> STRING_PARSER = (s) -> Optional.of(s);
   private static final Function<String, Optional<Integer>> INTEGER_PARSER =
       (s) -> {
         if (!s.matches("\\d+")) {
@@ -23,7 +27,7 @@ public class ClassParser<I> {
       };
   private static final Function<String, Optional<Double>> DOUBLE_PARSER =
       (s) -> {
-        if (!s.matches("(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?$")) {
+        if (!s.matches("(-?)([0-9]*)(\\.[0-9]+)?$")) {
           return Optional.empty();
         }
         return Optional.of(Double.parseDouble(s));
@@ -41,14 +45,9 @@ public class ClassParser<I> {
       };
 
   private final Map<Class<?>, ClassParseFunction<I, ?>> parseFunctionMap = new IdentityHashMap<>();
-  private BiFunction<String, I, Optional<?>> defaultParser;
 
   public ClassParser() {
-    this((content, author) -> Optional.of(content));
-  }
-
-  public ClassParser(BiFunction<String, I, Optional<?>> defaultParser) {
-    this.defaultParser = defaultParser;
+    applyParser(String.class, (content, context) -> STRING_PARSER.apply(content));
     applyParser(Integer.class, (content, context) -> INTEGER_PARSER.apply(content));
     applyParser(Double.class, (content, context) -> DOUBLE_PARSER.apply(content));
     applyParser(Long.class, (content, context) -> LONG_PARSER.apply(content));
@@ -58,32 +57,17 @@ public class ClassParser<I> {
     parseFunctionMap.put(clazz, function);
   }
 
-  public void setDefaultParser(BiFunction<String, I, Optional<?>> function) {
-    defaultParser = function;
+  public <T> Optional<T> parse(Class<T> clazz, ClassParseContext<I> context) {
+    return retrieveParser(clazz)
+        .flatMap(parser -> context.nextPiece().flatMap(content -> parser.apply(content, context)));
   }
 
-  public BiFunction<String, I, Optional<?>> getDefaultParser() {
-    return defaultParser;
-  }
-
-  public ArrayDeque<Optional<?>> parse(I author, String content, Class<?>[] classes) {
-    var contentArray = content.split("\\.");
-    var contentQueue = new ArrayDeque<>(Arrays.asList(contentArray));
-    var context = new ClassParseContext<>(author, contentQueue);
-    var parsed = new ArrayDeque<Optional<?>>();
-    for (var clazz : classes) {
-      if (contentQueue.isEmpty()) {
-        throw new IllegalStateException("Queue emptied before all classes were parsed.");
-      }
-      if (parseFunctionMap.containsKey(clazz)) {
-        parsed.addLast(parseFunctionMap.get(clazz).apply(contentQueue.pollFirst(), context));
-        continue;
-      }
-      throw new IllegalArgumentException("Failed to parse class `" + clazz.getName() + "`.");
+  @SuppressWarnings("unchecked")
+  public <T> Optional<ClassParseFunction<I, T>> retrieveParser(Class<T> clazz) {
+    ClassParseFunction<I, ?> unknownFunction = parseFunctionMap.get(clazz);
+    if (unknownFunction == null) {
+      return Optional.empty();
     }
-    contentQueue
-        .iterator()
-        .forEachRemaining(s -> parsed.addLast(defaultParser.apply(content, author)));
-    return parsed;
+    return Optional.of((ClassParseFunction<I, T>) unknownFunction);
   }
 }

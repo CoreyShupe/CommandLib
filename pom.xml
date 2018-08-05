@@ -6,7 +6,7 @@
 
     <groupId>com.github.coreyshupe</groupId>
     <artifactId>commandlib</artifactId>
-    <version>1.0.0</version>
+    <version>0.1.0</version>
     <name>Command Lib</name>
     <description>Simple general use command library.</description>
 
