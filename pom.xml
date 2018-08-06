@@ -8,16 +8,23 @@
     <artifactId>commandlib</artifactId>
     <version>0.1.0</version>
     <name>Command Lib</name>
+    <packaging>jar</packaging>
     <description>Simple general use command library.</description>
 
     <properties>
         <maven.compiler.source>1.10</maven.compiler.source>
         <maven.compiler.target>1.10</maven.compiler.target>
+        <test.assertj.version>3.9.0</test.assertj.version>
+        <test.testng.version>6.14.2</test.testng.version>
+        <lib.guava.version>24.0-jre</lib.guava.version>
+        <lib.immutables.version>2.5.5</lib.immutables.version>
+        <compile.spotless.version>1.0.0.BETA2</compile.spotless.version>
     </properties>
 
     <developers>
         <developer>
             <id>CoreyShupe</id>
+            <name>Corey Shupe</name>
             <email>coreyshupe101@gmail.com</email>
             <url>https://github.com/CoreyShupe</url>
         </developer>
@@ -25,16 +32,28 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${lib.guava.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.9.0</version>
+            <version>${test.assertj.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.14.2</version>
+            <version>${test.testng.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.immutables</groupId>
+            <artifactId>value</artifactId>
+            <version>${lib.immutables.version}</version>
+            <scope>provided</scope>
+            <!-- compile only -->
         </dependency>
     </dependencies>
 
@@ -44,7 +63,7 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>1.0.0.BETA2</version>
+                <version>${compile.spotless.version}</version>
                 <executions>
                     <execution>
                         <phase>verify</phase>
