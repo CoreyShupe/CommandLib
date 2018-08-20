@@ -7,3 +7,4 @@ admin|!echo world hello|world hello
 admin|!run test expectations where|Found:{test expectations} Extra:where
 admin|!run test|Found:{default result} Extra:test
 admin|!run|Found:{default result} Extra:
+user|!run|Cannot run command as non-admin.

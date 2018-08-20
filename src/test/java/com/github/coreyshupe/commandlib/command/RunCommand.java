@@ -17,6 +17,8 @@ public class RunCommand extends Command<String> {
                     .resetIfAbsent(true)
                     .defaultValue("default result")
                     .build())
+            .noPermissionConsumer(author -> functionality.take("Cannot run command as non-admin."))
+            .permissionPredicate(author -> author.equalsIgnoreCase("admin"))
             .build());
     this.functionality = functionality;
   }

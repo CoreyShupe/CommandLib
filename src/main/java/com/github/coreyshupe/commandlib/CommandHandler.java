@@ -79,24 +79,51 @@ public class CommandHandler<I> {
   public void runCommand(I author, String command, String content) {
     getCommand(command)
         .ifPresentOrElse(
-            (paired) -> {
-              var result =
-                  parser.parseParameters(
-                      paired.getKey().getParameters(), new CommandParseContext<>(author, content));
-              var event =
-                  ImmutableCommandEvent.<I>builder()
-                      .author(author)
-                      .parameterObjects(result.getKey())
-                      .extra(result.getValue())
-                      .build();
-              paired.getValue().accept(event);
-            },
+            (paired) ->
+                paired
+                    .getKey()
+                    .getPermissionPredicate()
+                    .ifPresentOrElse(
+                        predicate -> {
+                          if (predicate.test(author)) {
+                            execute(author, paired, content);
+                          } else {
+                            paired
+                                .getKey()
+                                .getNoPermissionConsumer()
+                                .ifPresentOrElse(
+                                    consumer -> consumer.accept(author),
+                                    () -> {
+                                      throw new IllegalStateException(
+                                          "Permission dropped for "
+                                              + author.toString()
+                                              + " during command "
+                                              + command
+                                              + ", with no valid consumer.");
+                                    });
+                          }
+                        },
+                        () -> execute(author, paired, content)),
             () -> {
               if (invalidCommandConsumer == null) {
                 throw new IllegalStateException("Failed to understand command " + command + ".");
               }
               invalidCommandConsumer.accept(author, command);
             });
+  }
+
+  private void execute(
+      I author, Pair<CommandInformation<I>, Consumer<CommandEvent<I>>> paired, String content) {
+    var result =
+        parser.parseParameters(
+            paired.getKey().getParameters(), new CommandParseContext<>(author, content));
+    var event =
+        ImmutableCommandEvent.<I>builder()
+            .author(author)
+            .parameterObjects(result.getKey())
+            .extra(result.getValue())
+            .build();
+    paired.getValue().accept(event);
   }
 
   public static <T> CommandHandler<T> of() {
