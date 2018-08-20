@@ -56,7 +56,8 @@ public class CommandParameterParser<I> implements ClassParser<CommandParseContex
     List<Optional<?>> paramOutput = new ArrayList<>();
     int index = 0;
     for (var parameter : parameters) {
-      paramOutput.add(parseParameter(index, parameter, context));
+      var result = parseParameter(index, parameter, context);
+      paramOutput.add(result);
       context.clearUsed();
       index++;
     }
@@ -68,10 +69,16 @@ public class CommandParameterParser<I> implements ClassParser<CommandParseContex
   public <T> Optional<T> parseParameter(
       int index, CommandParameter<T> parameter, CommandParseContext<I> context) {
     if (!context.hasMore()) {
+      if (parameter.getResetIfAbsent()) {
+        context.resetUsed();
+      }
       return retrieveDefault(index, parameter, context.getAuthor());
     }
     Optional<T> result = parse(parameter.getType(), context);
     if (!result.isPresent()) {
+      if (parameter.getResetIfAbsent()) {
+        context.resetUsed();
+      }
       result = retrieveDefault(index, parameter, context.getAuthor());
     }
     return result;

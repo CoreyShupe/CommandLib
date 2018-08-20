@@ -20,7 +20,10 @@ public class CommandParseContext<I> implements Supplier<String> {
 
   public CommandParseContext(I author, String content) {
     this.author = author;
-    this.currentlyAvailable = new ArrayDeque<>(Arrays.asList(content.split(" ")));
+    this.currentlyAvailable =
+        content.isEmpty()
+            ? new ArrayDeque<>()
+            : new ArrayDeque<>(Arrays.asList(content.split(" ")));
     this.currentlyUsed = new ArrayDeque<>();
   }
 

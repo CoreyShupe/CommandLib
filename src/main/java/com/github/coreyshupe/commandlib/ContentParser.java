@@ -24,7 +24,7 @@ public interface ContentParser {
         .contentParser(
             s -> {
               String command = s.substring(prefix.length()).split(" ")[0];
-              return PairTuple.of(command, s.substring(command.length()).trim());
+              return PairTuple.of(command, s.substring(command.length() + 1).trim());
             })
         .build();
   }
