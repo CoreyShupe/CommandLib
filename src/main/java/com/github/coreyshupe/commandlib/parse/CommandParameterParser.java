@@ -51,36 +51,41 @@ public class CommandParameterParser<I> implements ClassParser<CommandParseContex
     return Optional.of((Function<CommandParseContext<I>, T>) wildcardFunction);
   }
 
-  public Pair<List<Optional<?>>, String[]> parseParameters(
+  public Pair<List<Optional<?>>, List<String>> parseParameters(
       List<CommandParameter<?>> parameters, CommandParseContext<I> context) {
     List<Optional<?>> paramOutput = new ArrayList<>();
+    int index = 0;
     for (var parameter : parameters) {
-      paramOutput.add(parseParameter(parameter, context));
+      paramOutput.add(parseParameter(index, parameter, context));
+      index++;
     }
     List<String> extra = new ArrayList<>();
     context.retrieveRest().forEachRemaining(extra::add);
-    return PairTuple.of(paramOutput, extra.toArray(new String[] {}));
+    return PairTuple.of(paramOutput, extra);
   }
 
   public <T> Optional<T> parseParameter(
-      CommandParameter<T> parameter, CommandParseContext<I> context) {
+      int index, CommandParameter<T> parameter, CommandParseContext<I> context) {
     if (!context.hasMore()) {
-      return retrieveDefault(parameter, context.getAuthor());
+      return retrieveDefault(index, parameter, context.getAuthor());
     }
     Optional<T> result = parse(parameter.getType(), context);
     if (!result.isPresent()) {
-      result = retrieveDefault(parameter, context.getAuthor());
+      result = retrieveDefault(index, parameter, context.getAuthor());
     }
     return result;
   }
 
-  public <T> Optional<T> retrieveDefault(CommandParameter<T> parameter, I author) {
+  public <T> Optional<T> retrieveDefault(int index, CommandParameter<T> parameter, I author) {
     Optional<T> result =
         parameter
             .getDefaultValue()
             .flatMap(def -> parse(parameter.getType(), new CommandParseContext<>(author, def)));
     if (!result.isPresent() && !parameter.getOptional()) {
-      throw new IllegalArgumentException(""); // TODO
+      throw new IllegalArgumentException(
+          String.format(
+              "Failed to parse parameter{`%s`} of type{`%s`}",
+              index, parameter.getType().getName()));
     }
     return result;
   }

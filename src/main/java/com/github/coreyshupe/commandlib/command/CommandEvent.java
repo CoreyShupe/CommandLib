@@ -1,7 +1,7 @@
 package com.github.coreyshupe.commandlib.command;
 
 import com.google.common.base.Preconditions;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import java.util.Optional;
 import org.immutables.value.Value;
 
@@ -16,10 +16,10 @@ public interface CommandEvent<I> {
   I getAuthor();
 
   /** @return The pre-parsed parameters. */
-  List<Optional<?>> getParameterObjects();
+  ImmutableList<Optional<?>> getParameterObjects();
 
   /** @return The extra strings presented in the command. */
-  String[] getExtra();
+  ImmutableList<String> getExtra();
 
   /**
    * Cast the parameter to {@link T} from {@link #getParameterObjects()} based on the {@code int}
@@ -32,7 +32,7 @@ public interface CommandEvent<I> {
    */
   default <T> Optional<T> expectOptional(Class<T> clazz, int index) {
     Preconditions.checkNotNull(clazz, "The casting class cannot be null.");
-    return getParameterObjects().get(index).map(object -> clazz.cast(object));
+    return getParameterObjects().get(index).map(clazz::cast);
   }
 
   /**

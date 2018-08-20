@@ -1,12 +1,9 @@
 package example;
 
-import com.github.coreyshupe.commandlib.CommandHandler;
-import com.github.coreyshupe.commandlib.ContentDistributor;
 import com.github.coreyshupe.commandlib.command.Command;
 import com.github.coreyshupe.commandlib.command.CommandEvent;
 import com.github.coreyshupe.commandlib.command.ImmutableCommandInformation;
 import com.github.coreyshupe.commandlib.command.ImmutableCommandParameter;
-import com.github.coreyshupe.commandlib.parse.DefaultParser;
 import com.google.common.collect.ImmutableMap;
 
 /** @author CoreyShupe, created on 2018/08/06 */
@@ -29,12 +26,6 @@ public class BanCommand extends Command<String> {
                     .resetIfAbsent(false)
                     .build())
             .build());
-    CommandHandler<String> handler = CommandHandler.of();
-    handler.registerCommand(this);
-    handler.setInvalidCommandConsumer(str -> System.out.println("Sorry, " + str + " that's an invalid command!"));
-    handler.getParser().applyParser(User.class, DefaultParser.generateParser((s) -> new User()));
-    ContentDistributor<String> distributor = ContentDistributor.defaultPrefixDistributor(handler, "!");
-    distributor.handleContent("admin", "!ban <user>");
   }
 
   @Override

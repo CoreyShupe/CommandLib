@@ -1,6 +1,9 @@
 .idea/
 .github/
 
+# IntelliJ file
+*.iml
+
 # Compiled class file
 *.class
 

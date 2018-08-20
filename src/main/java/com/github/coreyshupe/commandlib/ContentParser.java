@@ -7,29 +7,19 @@ import java.util.function.Predicate;
 import org.immutables.value.Value;
 
 /**
- * An {@link interface} which takes in content and parses it into a command and distributes it to
+ * An {@code interface} which takes in content and parses it into a command and distributes it to
  * the command handler.
  *
  * @author CoreyShupe, created on 2018/08/06
  */
 @Value.Immutable
-public interface ContentDistributor<I> {
+public interface ContentParser {
   Predicate<String> getContentChecker();
 
   Function<String, Pair<String, String>> getContentParser();
 
-  CommandHandler<I> getCommandHandler();
-
-  default void handleContent(I author, String content) {
-    if (getContentChecker().test(content)) {
-      var information = getContentParser().apply(content);
-      getCommandHandler().runCommand(author, information.getKey(), information.getValue().trim());
-    }
-  }
-
-  static <I> ContentDistributor<I> defaultPrefixDistributor(
-      CommandHandler<I> handler, String prefix) {
-    return ImmutableContentDistributor.<I>builder()
+  static ContentParser defaultPrefixDistributor(String prefix) {
+    return ImmutableContentParser.builder()
         .contentChecker(s -> s.startsWith(prefix) && s.length() > prefix.length())
         .contentParser(
             s -> {

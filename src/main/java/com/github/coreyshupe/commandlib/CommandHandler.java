@@ -8,9 +8,11 @@ import com.github.coreyshupe.commandlib.parse.CommandParameterParser;
 import com.github.coreyshupe.commandlib.parse.CommandParseContext;
 import com.github.coreyshupe.commandlib.utility.Pair;
 import com.github.coreyshupe.commandlib.utility.PairTuple;
+import com.google.common.base.Preconditions;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -23,14 +25,24 @@ import java.util.stream.Collectors;
 public class CommandHandler<I> {
   private final Set<Pair<CommandInformation<I>, Consumer<CommandEvent<I>>>> commandSet;
   private final CommandParameterParser<I> parser;
-  private Consumer<I> invalidCommandConsumer;
+  private ContentParser contentParser;
+  private BiConsumer<I, String> invalidCommandConsumer;
 
-  public CommandHandler() {
+  private CommandHandler() {
     this.commandSet = new HashSet<>();
     this.parser = new CommandParameterParser<>();
   }
 
-  public void setInvalidCommandConsumer(Consumer<I> invalidCommandConsumer) {
+  private CommandHandler(String prefix) {
+    this();
+    this.contentParser = ContentParser.defaultPrefixDistributor(prefix);
+  }
+
+  public void setContentParser(ContentParser contentParser) {
+    this.contentParser = contentParser;
+  }
+
+  public void setInvalidCommandConsumer(BiConsumer<I, String> invalidCommandConsumer) {
     this.invalidCommandConsumer = invalidCommandConsumer;
   }
 
@@ -55,6 +67,15 @@ public class CommandHandler<I> {
     commandSet.add(PairTuple.of(information, event));
   }
 
+  public void acceptContent(I author, String content) {
+    Preconditions.checkState(
+        contentParser != null, "A content parser must be implemented to use this method.");
+    if (contentParser.getContentChecker().test(content)) {
+      var commandInfo = contentParser.getContentParser().apply(content);
+      runCommand(author, commandInfo.getKey(), commandInfo.getValue());
+    }
+  }
+
   public void runCommand(I author, String command, String content) {
     getCommand(command)
         .ifPresentOrElse(
@@ -74,11 +95,17 @@ public class CommandHandler<I> {
               if (invalidCommandConsumer == null) {
                 throw new IllegalStateException("Failed to understand command " + command + ".");
               }
-              invalidCommandConsumer.accept(author);
+              invalidCommandConsumer.accept(author, command);
             });
   }
 
   public static <T> CommandHandler<T> of() {
     return new CommandHandler<>();
+  }
+
+  public static <T> CommandHandler<T> of(String prefix) {
+    Preconditions.checkArgument(
+        prefix != null && !prefix.isEmpty(), "The prefix must not be null or empty.");
+    return new CommandHandler<>(prefix);
   }
 }
