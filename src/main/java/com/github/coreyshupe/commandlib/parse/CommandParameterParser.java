@@ -57,6 +57,7 @@ public class CommandParameterParser<I> implements ClassParser<CommandParseContex
     int index = 0;
     for (var parameter : parameters) {
       paramOutput.add(parseParameter(index, parameter, context));
+      context.clearUsed();
       index++;
     }
     List<String> extra = new ArrayList<>();

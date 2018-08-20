@@ -8,5 +8,6 @@ jobs:
     - stage: build
       jdk: oraclejdk10
       script: mvn -B verify
-    - jdk: openjdk10
+    - stage: build
+      jdk: openjdk10
       script: mvn -B verify
