@@ -59,12 +59,15 @@ public class TestCommandFunctionality {
   public void testCommandExpectations() {
     while (commandInfo.size() > 0) {
       var polled = commandInfo.poll();
+      System.out.println("Ran command => " + polled.getValue() + " | from => " + polled.getKey());
+      System.out.println("=> Expected => `" + commandResponses.peek() + "`");
       commandHandler.acceptContent(polled.getKey(), polled.getValue());
     }
   }
 
   @Ignore
   public void take(String str) {
+    System.out.println("=> And received => `" + str + "`");
     Assertions.assertThat(str).isEqualToIgnoringCase(commandResponses.poll());
   }
 }
