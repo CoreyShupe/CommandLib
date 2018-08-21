@@ -50,24 +50,34 @@ public class TestCommandFunctionality {
     } catch (IOException ex) {
       throw new SecurityException(ex);
     }
-    commandHandler.registerCommand(new EchoCommand(this));
-    commandHandler.registerCommand(new HelloCommand(this));
-    commandHandler.registerCommand(new RunCommand(this));
   }
 
   @Test
-  public void testCommandExpectations() {
+  public void testConstructedCommandExpectations() {
+    commandHandler.registerCommand(new ConstructedEchoCommand(this));
+    commandHandler.registerCommand(new ConstructedHelloCommand(this));
+    commandHandler.registerCommand(new ConstructedRunCommand(this));
+    runTests();
+  }
+
+  @Test
+  public void testConstructiveCommandExpectations() {
+    commandHandler.registerCommand(new ConstructiveEchoCommand(this));
+    commandHandler.registerCommand(new ConstructiveHelloCommand(this));
+    commandHandler.registerCommand(new ConstructiveRunCommand(this));
+    runTests();
+  }
+
+  @Ignore
+  public void runTests() {
     while (commandInfo.size() > 0) {
       var polled = commandInfo.poll();
-      System.out.println("Ran command => " + polled.getValue() + " | from => " + polled.getKey());
-      System.out.println("=> Expected => `" + commandResponses.peek() + "`");
       commandHandler.acceptContent(polled.getKey(), polled.getValue());
     }
   }
 
   @Ignore
   public void take(String str) {
-    System.out.println("=> And received => `" + str + "`");
     Assertions.assertThat(str).isEqualToIgnoringCase(commandResponses.poll());
   }
 }

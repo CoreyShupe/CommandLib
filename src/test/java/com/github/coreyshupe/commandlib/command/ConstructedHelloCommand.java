@@ -3,21 +3,19 @@ package com.github.coreyshupe.commandlib.command;
 import org.testng.annotations.Ignore;
 
 @Ignore
-public class HelloCommand extends Command<String> {
+public class ConstructedHelloCommand extends ConstructedCommand<String> {
   private final TestCommandFunctionality functionality;
 
-  public HelloCommand(TestCommandFunctionality functionality) {
+  public ConstructedHelloCommand(TestCommandFunctionality functionality) {
     super(
         ImmutableCommandInformation.<String>builder()
             .name("hello")
             .addParameters(
-                ImmutableCommandParameter.<String>builder()
-                    .type(String.class)
+                CommandParameter.ofBuilder(String.class)
                     .optional(true)
                     .resetIfAbsent(false)
                     .build(),
-                ImmutableCommandParameter.<String>builder()
-                    .type(String.class)
+                CommandParameter.ofBuilder(String.class)
                     .optional(true)
                     .resetIfAbsent(false)
                     .build())

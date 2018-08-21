@@ -3,12 +3,17 @@ package com.github.coreyshupe.commandlib.command;
 import org.testng.annotations.Ignore;
 
 @Ignore
-public class EchoCommand extends Command<String> {
+public class ConstructiveEchoCommand extends ConstructiveCommand<String> {
   private final TestCommandFunctionality functionality;
 
-  public EchoCommand(TestCommandFunctionality functionality) {
-    super(ImmutableCommandInformation.<String>builder().name("echo").build());
+  public ConstructiveEchoCommand(TestCommandFunctionality functionality) {
+    super("echo");
     this.functionality = functionality;
+  }
+
+  @Override
+  public void init() {
+    addAliases("respond");
   }
 
   @Override

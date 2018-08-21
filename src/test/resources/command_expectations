@@ -3,7 +3,7 @@ user|!hello|hello user
 admin|!hello wondered|hello wondered admin
 user|!hello wondered wonderful|hello wondered user wonderful
 admin|!echo hello world|hello world
-admin|!echo world hello|world hello
+admin|!respond world hello|world hello
 admin|!run test expectations where|Found:{test expectations} Extra:where
 admin|!run test|Found:{default result} Extra:test
 admin|!run|Found:{default result} Extra:

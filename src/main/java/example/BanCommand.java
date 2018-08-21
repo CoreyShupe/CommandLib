@@ -1,13 +1,10 @@
 package example;
 
-import com.github.coreyshupe.commandlib.command.Command;
-import com.github.coreyshupe.commandlib.command.CommandEvent;
-import com.github.coreyshupe.commandlib.command.ImmutableCommandInformation;
-import com.github.coreyshupe.commandlib.command.ImmutableCommandParameter;
+import com.github.coreyshupe.commandlib.command.*;
 import com.google.common.collect.ImmutableMap;
 
 /** @author CoreyShupe, created on 2018/08/06 */
-public class BanCommand extends Command<String> {
+public class BanCommand extends ConstructedCommand<String> {
   public BanCommand() {
     super(
         ImmutableCommandInformation.<String>builder()

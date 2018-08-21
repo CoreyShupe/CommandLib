@@ -10,9 +10,9 @@ import org.immutables.value.Value;
  * @author CoreyShupe, created on 2018/08/05
  */
 @Value.Immutable
-public interface CommandParameter<T> {
+public interface CommandParameter<I> {
   /** @return The {@link Class} type of the parameter. */
-  Class<T> getType();
+  Class<I> getType();
 
   /** @return The {@link Optional} wrapping the {@link String} description of the parameter. */
   Optional<String> getDescription();
@@ -25,4 +25,8 @@ public interface CommandParameter<T> {
 
   /** @return The state to determine if the content should be reset if absent. */
   boolean getResetIfAbsent();
+
+  static <T> ImmutableCommandParameter.Builder<T> ofBuilder(Class<T> clazz) {
+    return ImmutableCommandParameter.<T>builder().type(clazz);
+  }
 }

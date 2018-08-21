@@ -3,16 +3,15 @@ package com.github.coreyshupe.commandlib.command;
 import org.testng.annotations.Ignore;
 
 @Ignore
-public class RunCommand extends Command<String> {
+public class ConstructedRunCommand extends ConstructedCommand<String> {
   private final TestCommandFunctionality functionality;
 
-  public RunCommand(TestCommandFunctionality functionality) {
+  public ConstructedRunCommand(TestCommandFunctionality functionality) {
     super(
         ImmutableCommandInformation.<String>builder()
             .name("run")
             .addParameters(
-                ImmutableCommandParameter.<UtilityPairedFoundation>builder()
-                    .type(UtilityPairedFoundation.class)
+                CommandParameter.ofBuilder(UtilityPairedFoundation.class)
                     .optional(false)
                     .resetIfAbsent(true)
                     .defaultValue("default result")
