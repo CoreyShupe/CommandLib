@@ -142,7 +142,9 @@ public abstract class ConstructiveCommand<I> implements Command<I> {
   }
 
   private void assertUnbuilt() {
-    Preconditions.checkState(builtInformation == null, "Command already built. Make sure to do all building within the #init method.");
+    Preconditions.checkState(
+        builtInformation == null,
+        "Command already built. Make sure to do all building within the #init method.");
   }
 
   private void build() {
