@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>commandlib-base</artifactId>
+        <groupId>com.github.coreyshupe</groupId>
+        <version>0.0.1</version>
+    </parent>
+    <name>CommandLib-API</name>
+    <artifactId>commandlib</artifactId>
+    <packaging>jar</packaging>
+    <description>Simple general use command library.</description>
+
+    <properties>
+        <generatedSources>${project.build.directory}/generated-sources/java</generatedSources>
+        <test.assertj.version>3.9.0</test.assertj.version>
+        <test.testng.version>6.14.2</test.testng.version>
+        <lib.guava.version>24.0-jre</lib.guava.version>
+        <lib.immutables.version>2.5.5</lib.immutables.version>
+    </properties>
+
+    <developers>
+        <developer>
+            <id>CoreyShupe</id>
+            <name>Corey Shupe</name>
+            <email>coreyshupe101@gmail.com</email>
+            <url>https://github.com/CoreyShupe</url>
+        </developer>
+    </developers>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${lib.guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${test.assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${test.testng.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.immutables</groupId>
+            <artifactId>value</artifactId>
+            <version>${lib.immutables.version}</version>
+            <scope>provided</scope>
+            <!-- compile only -->
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>CommandLib-${project.version}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <compilerArgument>-proc:none</compilerArgument>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.mysema.maven</groupId>
+                <artifactId>apt-maven-plugin</artifactId>
+                <version>1.1.3</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${generatedSources}</outputDirectory>
+                            <processors>
+                                <processor>org.immutables.processor.ProxyProcessor</processor>
+                            </processors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${generatedSources}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
